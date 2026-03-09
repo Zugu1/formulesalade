@@ -1,0 +1,292 @@
+```jsx
+import { useState } from "react";
+
+const sections = [
+  {
+    number: "01",
+    title: "Base légumes",
+    subtitle: "Préparer le dimanche — pour 6 salades",
+    accent: "#4A7C3F",
+    bg: "#F2F7EF",
+    items: [
+      { emoji: "🍅", label: "Petites tomates", note: "Rincées et salées pour sécher" },
+      { emoji: "🧅", label: "Oignon rouge", note: "Coupé en petits dés" },
+      { emoji: "🥒", label: "Concombre", note: "Même taille que les autres" },
+    ],
+    tip: "Couper tout à la même taille — effet salsa.",
+    options: "Options libres : jalapeños · poivron · pois chiches · cornichons",
+    variations: [
+      { label: "Vibe hivernale", detail: "Betterave rôtie · orange · fenouil" },
+      { label: "Tex-mex", detail: "Poivrons grillés · maïs · avocat" },
+      { label: "Japonaise", detail: "Radis · edamame · concombre" },
+    ],
+  },
+  {
+    number: "02",
+    title: "Feuilles vertes",
+    subtitle: "Hachées au moment — chaque jour",
+    accent: "#6A8A3A",
+    bg: "#F4F8EE",
+    items: [
+      { emoji: "🥗", label: "Mesclun", note: "Doux, passe-partout" },
+      { emoji: "🌿", label: "Roquette", note: "Poivrée, change le caractère" },
+      { emoji: "🥬", label: "Kale massé", note: "Costaud, supporte les vinaigrettes crémeuses" },
+    ],
+    tip: "Les feuilles ne se mélangent jamais à l'avance — toujours au moment.",
+    options: "Aussi : épinards · chou rouge émincé · radicchio · mélange roquette+radicchio",
+    variations: [
+      { label: "Amer & beau", detail: "Roquette + radicchio" },
+      { label: "Rustique", detail: "Chou vert émincé très fin" },
+      { label: "Doux & nutritif", detail: "Épinards baby" },
+    ],
+  },
+  {
+    number: "03",
+    title: "Glucides",
+    subtitle: "3 portions pour les 6 salades",
+    accent: "#A0632A",
+    bg: "#FBF5EC",
+    items: [
+      { emoji: "🫙", label: "Couscous / semoule", note: "1 boîte = 3 portions pile" },
+      { emoji: "🌾", label: "Céréale au choix", note: "~1 tasse cuite pour la semaine" },
+      { emoji: "🍠", label: "Patate douce", note: "En plus grande quantité" },
+    ],
+    tip: "3 portions seulement — pour garder le croquant de la salade.",
+    options: "Aussi : orge · farro · lentilles · riz sauvage · soba froids · pâtes",
+    variations: [
+      { label: "Plus mâchu", detail: "Orge perlé ou farro — goût noisette" },
+      { label: "Vibe asiatique", detail: "Soba froids — change complètement le registre" },
+      { label: "Version croûton", detail: "Pain pita ou flatbread grillé cassé en morceaux" },
+      { label: "Glucide + protéine", detail: "Lentilles du Puy — font les deux à la fois" },
+    ],
+  },
+  {
+    number: "04",
+    title: "Protéine",
+    subtitle: "6 portions — chaude ou froide",
+    accent: "#3A5A8A",
+    bg: "#EEF2F8",
+    items: [
+      { emoji: "❄️", label: "Protéine froide", note: "Va directement dans le grand bol" },
+      { emoji: "🔥", label: "Protéine chaude", note: "Gardée de côté, chauffée au moment" },
+      { emoji: "🌱", label: "Exemples vegans", note: "Tempeh, tofu, nuggets, seitan…" },
+    ],
+    tip: "Ne pas mélanger une protéine chaude à l'avance — les légumes ramollissent.",
+    options: "Tout fonctionne selon ton régime alimentaire",
+    variations: [
+      { label: "Simple & rapide", detail: "Tempeh fumé — déjà mariné, straight out of the pack" },
+      { label: "Croustillant", detail: "Tofu ou pois chiches passés à l'air fryer" },
+      { label: "Copieux", detail: "Seitan épicé façon steak" },
+    ],
+  },
+  {
+    number: "05",
+    title: "Vinaigrette",
+    subtitle: "L'élément qui change tout",
+    accent: "#8A3A3A",
+    bg: "#F8EEEE",
+    items: [
+      { emoji: "🫙", label: "~⅓ pot de tahini", note: "La base crémeuse" },
+      { emoji: "🍋", label: "Liquide piquant", note: "Citron · lime · saumure · vinaigre" },
+      { emoji: "🌿", label: "Herbe mixée à l'eau", note: "Basilic, aneth… → verser dans le tahini" },
+      { emoji: "🧂", label: "Levure nutritionnelle", note: "¼ tasse minimum — obligatoire" },
+    ],
+    tip: "Ajouter l'eau progressivement — la vinaigrette épaissit au frigo.",
+    options: "Épices libres : harissa · ail · cumin · paprika fumé · poivre",
+    variations: [
+      { label: "Asiatique umami", detail: "Miso + gingembre + citron vert + huile de sésame" },
+      { label: "Nord-africaine", detail: "Harissa + citron + huile d'olive" },
+      { label: "Classique relevée", detail: "Moutarde Dijon + vinaigre de cidre + sirop d'érable" },
+      { label: "Satay", detail: "Cacahuètes mixées + lime + piment + tamari" },
+    ],
+  },
+];
+
+const assemblySteps = [
+  "Hacher les feuilles vertes",
+  "Ajouter ⅙ de la base",
+  "Poser la protéine",
+  "Verser ⅙ de vinaigrette",
+  "Mélanger & garnir",
+];
+
+const toppings = ["Kimchi", "Choucroute", "Pickled onion", "Feta", "Chili crisp", "Noix & graines", "Croûtons", "Pois chiches croustillants"];
+
+const themeVariations = [
+  { name: "Taco", detail: "Haricots noirs · riz mexicain · coriandre · vinaigrette lime" },
+  { name: "Automne", detail: "Patate douce · kale · seitan épicé · vinaigrette miso" },
+  { name: "Soba", detail: "Nouilles froides · edamame · radis · vinaigrette cacahuète" },
+  { name: "Pasta salad", detail: "Pâtes froides · tahini basilic · roquette" },
+  { name: "Big Mac", detail: "Beyond Burger · chou · moutarde-cornichon" },
+  { name: "Spring roll", detail: "Riz sauvage · chou · vinaigrette gingembre-sésame" },
+];
+
+export default function SaladFormula() {
+  const [active, setActive] = useState(null);
+  const [showVariations, setShowVariations] = useState({});
+
+  const toggleVariation = (e, i) => {
+    e.stopPropagation();
+    setShowVariations(prev => ({ ...prev, [i]: !prev[i] }));
+  };
+
+  return (
+    <div style={{
+      fontFamily: "Georgia, serif",
+      background: "#F9F9F6",
+      minHeight: "100vh",
+      padding: "40px 20px 64px",
+      color: "#1c1c1a",
+    }}>
+      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
+
+        {/* Header */}
+        <div style={{ marginBottom: "40px", paddingBottom: "32px", borderBottom: "1px solid #e2e2dc" }}>
+          <p style={{ fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#aaa", margin: "0 0 12px", fontFamily: "monospace" }}>
+            Meal prep · 6 salades · formule modulaire
+          </p>
+          <h1 style={{ fontSize: "clamp(36px,7vw,52px)", fontWeight: "300", lineHeight: 1.1, margin: "0 0 16px", letterSpacing: "-0.5px" }}>
+            La Formule <em style={{ fontWeight: 500 }}>Salade</em>
+          </h1>
+          <p style={{ color: "#666", fontSize: "15px", lineHeight: 1.7, maxWidth: "400px", margin: 0 }}>
+            Une base préparée le dimanche. Une salade fraîche chaque jour. Pas une recette — une structure.
+          </p>
+        </div>
+
+        {/* Steps */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "3px", marginBottom: "32px" }}>
+          {sections.map((s, i) => (
+            <div
+              key={i}
+              onClick={() => setActive(active === i ? null : i)}
+              style={{
+                background: active === i ? s.bg : "#fff",
+                border: `1px solid ${active === i ? s.accent + "40" : "#e8e8e3"}`,
+                borderRadius: "4px",
+                padding: "20px 22px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "16px" }}>
+                  <span style={{ fontFamily: "monospace", fontSize: "10px", letterSpacing: "2px", color: s.accent }}>{s.number}</span>
+                  <div>
+                    <span style={{ fontSize: "18px" }}>{s.title}</span>
+                    <span style={{ fontSize: "12px", color: "#999", marginLeft: "10px" }}>{s.subtitle}</span>
+                  </div>
+                </div>
+                <span style={{
+                  color: "#ccc", fontSize: "22px", fontWeight: "300",
+                  display: "inline-block",
+                  transform: active === i ? "rotate(45deg)" : "none",
+                  transition: "transform 0.2s",
+                }}>+</span>
+              </div>
+
+              {active === i && (
+                <div style={{ marginTop: "20px", paddingTop: "18px", borderTop: `1px solid ${s.accent}20` }}>
+                  {/* Base items */}
+                  <p style={{ fontFamily: "monospace", fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: s.accent, margin: "0 0 10px" }}>Base</p>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "8px", marginBottom: "16px" }}>
+                    {s.items.map((item, j) => (
+                      <div key={j} style={{
+                        background: "#fff", border: `1px solid ${s.accent}20`,
+                        borderRadius: "4px", padding: "12px 14px",
+                      }}>
+                        <div style={{ fontSize: "20px", marginBottom: "6px" }}>{item.emoji}</div>
+                        <div style={{ fontSize: "13px", fontWeight: "500", marginBottom: "3px" }}>{item.label}</div>
+                        <div style={{ fontSize: "11px", color: "#999", lineHeight: 1.4 }}>{item.note}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ borderLeft: `2px solid ${s.accent}`, paddingLeft: "12px", fontSize: "13px", color: "#555", marginBottom: "12px" }}>
+                    {s.tip}
+                  </div>
+
+                  {/* Variations toggle */}
+                  <button
+                    onClick={(e) => toggleVariation(e, i)}
+                    style={{
+                      background: "none", border: `1px solid ${s.accent}30`,
+                      borderRadius: "20px", padding: "5px 12px",
+                      fontSize: "11px", color: s.accent, cursor: "pointer",
+                      fontFamily: "monospace", letterSpacing: "1px",
+                      marginBottom: showVariations[i] ? "12px" : "0",
+                    }}
+                  >
+                    {showVariations[i] ? "↑ masquer les variations" : "↓ voir les variations"}
+                  </button>
+
+                  {showVariations[i] && (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "6px", marginBottom: "12px" }}>
+                      {s.variations.map((v, k) => (
+                        <div key={k} style={{
+                          background: s.bg, border: `1px dashed ${s.accent}30`,
+                          borderRadius: "4px", padding: "10px 12px",
+                        }}>
+                          <div style={{ fontSize: "12px", fontWeight: "600", marginBottom: "3px", color: s.accent }}>{v.label}</div>
+                          <div style={{ fontSize: "11px", color: "#777", lineHeight: 1.4 }}>{v.detail}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <p style={{ fontSize: "11px", color: "#aaa", margin: 0, fontFamily: "monospace" }}>{s.options}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Assembly */}
+        <div style={{ background: "#fff", border: "1px solid #e8e8e3", borderRadius: "4px", padding: "24px 22px", marginBottom: "8px" }}>
+          <p style={{ fontFamily: "monospace", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#aaa", margin: "0 0 16px" }}>
+            Assemblage quotidien
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", alignItems: "center" }}>
+            {assemblySteps.map((step, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{
+                  width: "24px", height: "24px", borderRadius: "50%",
+                  background: "#1c1c1a", color: "#fff",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontFamily: "monospace", fontSize: "10px", flexShrink: 0,
+                }}>{i + 1}</div>
+                <span style={{ fontSize: "13px" }}>{step}</span>
+                {i < assemblySteps.length - 1 && <span style={{ color: "#ccc" }}>→</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Toppings */}
+        <div style={{ background: "#fff", border: "1px solid #e8e8e3", borderRadius: "4px", padding: "16px 22px", marginBottom: "32px", display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center" }}>
+          <span style={{ fontFamily: "monospace", fontSize: "10px", letterSpacing: "2px", textTransform: "uppercase", color: "#aaa", marginRight: "4px" }}>Toppings</span>
+          {toppings.map((t, i) => (
+            <span key={i} style={{ fontSize: "12px", color: "#555", padding: "4px 10px", border: "1px solid #e5e5e0", borderRadius: "20px" }}>{t}</span>
+          ))}
+        </div>
+
+        {/* Theme variations */}
+        <p style={{ fontFamily: "monospace", fontSize: "10px", letterSpacing: "3px", textTransform: "uppercase", color: "#aaa", margin: "0 0 12px" }}>
+          Salades thématiques
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "8px" }}>
+          {themeVariations.map((v, i) => (
+            <div key={i} style={{ background: "#fff", border: "1px solid #e8e8e3", borderRadius: "4px", padding: "16px 18px" }}>
+              <div style={{ fontSize: "17px", fontWeight: "500", marginBottom: "6px" }}>{v.name}</div>
+              <div style={{ fontSize: "11px", color: "#999", lineHeight: 1.5 }}>{v.detail}</div>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ marginTop: "40px", fontFamily: "monospace", fontSize: "10px", color: "#ccc", textAlign: "center", letterSpacing: "1px" }}>
+          Cliquer sur chaque étape · puis sur "voir les variations"
+        </p>
+      </div>
+    </div>
+  );
+}
+```
