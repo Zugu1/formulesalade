@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Formule Salade</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, serif;
+      background: #F9F9F6;
+      color: #1c1c1a;
+      padding: 40px 20px 64px;
+    }
+
+    .wrap { max-width: 720px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #e2e2dc;
+    }
+    .header .label {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: clamp(36px, 7vw, 52px);
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    .header h1 em { font-weight: 500; }
+    .header p { color: #666; font-size: 15px; line-height: 1.7; max-width: 400px; }
+
+    /* Cards */
+    .cards { display: flex; flex-direction: column; gap: 3px; margin-bottom: 32px; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e3;
+      border-radius: 4px;
+      padding: 20px 22px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-left { display: flex; align-items: baseline; gap: 16px; }
+    .card-num {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+    .card-title { font-size: 18px; }
+    .card-sub { font-size: 12px; color: #999; margin-left: 10px; }
+    .card-toggle {
+      color: #ccc;
+      font-size: 22px;
+      font-weight: 300;
+      transition: transform 0.2s;
+      display: inline-block;
+      line-height: 1;
+    }
+    .card.open .card-toggle { transform: rotate(45deg); }
+
+    .card-body {
+      display: none;
+      margin-top: 20px;
+      padding-top: 18px;
+    }
+    .card.open .card-body { display: block; }
+
+    .section-label {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .item {
+      background: #fff;
+      border-radius: 4px;
+      padding: 12px 14px;
+    }
+    .item-emoji { font-size: 20px; margin-bottom: 6px; }
+    .item-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .item-note { font-size: 11px; color: #999; line-height: 1.4; }
+
+    .tip {
+      border-left: 2px solid;
+      padding-left: 12px;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+
+    .var-btn {
+      background: none;
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: monospace;
+      letter-spacing: 1px;
+      margin-bottom: 0;
+      transition: margin-bottom 0.1s;
+    }
+
+    .var-grid {
+      display: none;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 6px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+    .var-grid.open { display: grid; }
+
+    .var-card {
+      border: 1px dashed;
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+    .var-card-label { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+    .var-card-detail { font-size: 11px; color: #777; line-height: 1.4; }
+
+    .options { font-size: 11px; color: #aaa; font-family: monospace; margin-top: 12px; }
+
+    /* Assembly */
+    .assembly, .toppings-row {
+      background: #fff;
+      border: 1px solid #e8e8e3;
+      border-radius: 4px;
+      padding: 24px 22px;
+      margin-bottom: 8px;
+    }
+    .mono-label {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+    .steps { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .step { display: flex; align-items: center; gap: 8px; }
+    .step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #1c1c1a;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: monospace;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    .step-text { font-size: 13px; }
+    .arrow { color: #ccc; }
+
+    /* Toppings */
+    .toppings-row {
+      padding: 16px 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 32px;
+    }
+    .toppings-label {
+      font-family: monospace;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-right: 4px;
+    }
+    .tag {
+      font-size: 12px;
+      color: #555;
+      padding: 4px 10px;
+      border: 1px solid #e5e5e0;
+      border-radius: 20px;
+    }
+
+    /* Theme variations */
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .theme-card {
+      background: #fff;
+      border: 1px solid #e8e8e3;
+      border-radius: 4px;
+      padding: 16px 18px;
+    }
+    .theme-name { font-size: 17px; font-weight: 500; margin-bottom: 6px; }
+    .theme-detail { font-size: 11px; color: #999; line-height: 1.5; }
+
+    .footer {
+      margin-top: 40px;
+      font-family: monospace;
+      font-size: 10px;
+      color: #ccc;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="label">Meal prep · 6 salades · formule modulaire</div>
+    <h1>La Formule <em>Salade</em></h1>
+    <p>Une base préparée le dimanche. Une salade fraîche chaque jour. Pas une recette — une structure.</p>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="assembly">
+    <div class="mono-label">Assemblage quotidien</div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <div class="toppings-row">
+    <span class="toppings-label">Toppings</span>
+    <span class="tag">Kimchi</span>
+    <span class="tag">Choucroute</span>
+    <span class="tag">Pickled onion</span>
+    <span class="tag">Feta</span>
+    <span class="tag">Chili crisp</span>
+    <span class="tag">Noix & graines</span>
+    <span class="tag">Croûtons</span>
+    <span class="tag">Pois chiches croustillants</span>
+  </div>
+
+  <div class="mono-label">Salades thématiques</div>
+  <div class="themes-grid" id="themes"></div>
+
+  <p class="footer">Cliquer sur chaque étape · puis sur "voir les variations"</p>
+</div>
+
+<script>
+const sections = [
+  {
+    number: "01", title: "Base légumes", subtitle: "Préparer le dimanche — pour 6 salades",
+    accent: "#4A7C3F", bg: "#F2F7EF",
+    items: [
+      { emoji: "🍅", label: "Petites tomates", note: "Rincées et salées pour sécher" },
+      { emoji: "🧅", label: "Oignon rouge", note: "Coupé en petits dés" },
+      { emoji: "🥒", label: "Concombre", note: "Même taille que les autres" },
+    ],
+    tip: "Couper tout à la même taille — effet salsa.",
+    options: "Options libres : jalapeños · poivron · pois chiches · cornichons",
+    variations: [
+      { label: "Vibe hivernale", detail: "Betterave rôtie · orange · fenouil" },
+      { label: "Tex-mex", detail: "Poivrons grillés · maïs · avocat" },
+      { label: "Japonaise", detail: "Radis · edamame · concombre" },
+    ],
+  },
+  {
+    number: "02", title: "Feuilles vertes", subtitle: "Hachées au moment — chaque jour",
+    accent: "#6A8A3A", bg: "#F4F8EE",
+    items: [
+      { emoji: "🥗", label: "Mesclun", note: "Doux, passe-partout" },
+      { emoji: "🌿", label: "Roquette", note: "Poivrée, change le caractère" },
+      { emoji: "🥬", label: "Kale massé", note: "Costaud, supporte les vinaigrettes crémeuses" },
+    ],
+    tip: "Les feuilles ne se mélangent jamais à l'avance — toujours au moment.",
+    options: "Aussi : épinards · chou rouge émincé · radicchio · mélange roquette+radicchio",
+    variations: [
+      { label: "Amer & beau", detail: "Roquette + radicchio" },
+      { label: "Rustique", detail: "Chou vert émincé très fin" },
+      { label: "Doux & nutritif", detail: "Épinards baby" },
+    ],
+  },
+  {
+    number: "03", title: "Glucides", subtitle: "3 portions pour les 6 salades",
+    accent: "#A0632A", bg: "#FBF5EC",
+    items: [
+      { emoji: "🫙", label: "Couscous / semoule", note: "1 boîte = 3 portions pile" },
+      { emoji: "🌾", label: "Céréale au choix", note: "~1 tasse cuite pour la semaine" },
+      { emoji: "🍠", label: "Patate douce", note: "En plus grande quantité" },
+    ],
+    tip: "3 portions seulement — pour garder le croquant de la salade.",
+    options: "Aussi : orge · farro · lentilles · riz sauvage · soba froids · pâtes",
+    variations: [
+      { label: "Plus mâchu", detail: "Orge perlé ou farro — goût noisette" },
+      { label: "Vibe asiatique", detail: "Soba froids — change complètement le registre" },
+      { label: "Version croûton", detail: "Pain pita ou flatbread grillé cassé en morceaux" },
+      { label: "Glucide + protéine", detail: "Lentilles du Puy — font les deux à la fois" },
+    ],
+  },
+  {
+    number: "04", title: "Protéine", subtitle: "6 portions — chaude ou froide",
+    accent: "#3A5A8A", bg: "#EEF2F8",
+    items: [
+      { emoji: "❄️", label: "Protéine froide", note: "Va directement dans le grand bol" },
+      { emoji: "🔥", label: "Protéine chaude", note: "Gardée de côté, chauffée au moment" },
+      { emoji: "🌱", label: "Exemples vegans", note: "Tempeh, tofu, nuggets, seitan…" },
+    ],
+    tip: "Ne pas mélanger une protéine chaude à l'avance — les légumes ramollissent.",
+    options: "Tout fonctionne selon ton régime alimentaire",
+    variations: [
+      { label: "Simple & rapide", detail: "Tempeh fumé — déjà mariné, straight out of the pack" },
+      { label: "Croustillant", detail: "Tofu ou pois chiches passés à l'air fryer" },
+      { label: "Copieux", detail: "Seitan épicé façon steak" },
+    ],
+  },
+  {
+    number: "05", title: "Vinaigrette", subtitle: "L'élément qui change tout",
+    accent: "#8A3A3A", bg: "#F8EEEE",
+    items: [
+      { emoji: "🫙", label: "~⅓ pot de tahini", note: "La base crémeuse" },
+      { emoji: "🍋", label: "Liquide piquant", note: "Citron · lime · saumure · vinaigre" },
+      { emoji: "🌿", label: "Herbe mixée à l'eau", note: "Basilic, aneth… → verser dans le tahini" },
+      { emoji: "🧂", label: "Levure nutritionnelle", note: "¼ tasse minimum — obligatoire" },
+    ],
+    tip: "Ajouter l'eau progressivement — la vinaigrette épaissit au frigo.",
+    options: "Épices libres : harissa · ail · cumin · paprika fumé · poivre",
+    variations: [
+      { label: "Asiatique umami", detail: "Miso + gingembre + citron vert + huile de sésame" },
+      { label: "Nord-africaine", detail: "Harissa + citron + huile d'olive" },
+      { label: "Classique relevée", detail: "Moutarde Dijon + vinaigre de cidre + sirop d'érable" },
+      { label: "Satay", detail: "Cacahuètes mixées + lime + piment + tamari" },
+    ],
+  },
+];
+
+const steps = ["Hacher les feuilles vertes", "Ajouter ⅙ de la base", "Poser la protéine", "Verser ⅙ de vinaigrette", "Mélanger & garnir"];
+
+const themes = [
+  { name: "Taco", detail: "Haricots noirs · riz mexicain · coriandre · vinaigrette lime" },
+  { name: "Automne", detail: "Patate douce · kale · seitan épicé · vinaigrette miso" },
+  { name: "Soba", detail: "Nouilles froides · edamame · radis · vinaigrette cacahuète" },
+  { name: "Pasta salad", detail: "Pâtes froides · tahini basilic · roquette" },
+  { name: "Big Mac", detail: "Beyond Burger · chou · moutarde-cornichon" },
+  { name: "Spring roll", detail: "Riz sauvage · chou · vinaigrette gingembre-sésame" },
+];
+
+// Build cards
+const cardsEl = document.getElementById("cards");
+sections.forEach((s, i) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="card-header">
+      <div class="card-left">
+        <span class="card-num" style="color:${s.accent}">${s.number}</span>
+        <div>
+          <span class="card-title">${s.title}</span>
+          <span class="card-sub">${s.subtitle}</span>
+        </div>
+      </div>
+      <span class="card-toggle">+</span>
+    </div>
+    <div class="card-body" style="border-top: 1px solid ${s.accent}20">
+      <div class="section-label" style="color:${s.accent}">Base</div>
+      <div class="items-grid">
+        ${s.items.map(it => `
+          <div class="item" style="border: 1px solid ${s.accent}20">
+            <div class="item-emoji">${it.emoji}</div>
+            <div class="item-name">${it.label}</div>
+            <div class="item-note">${it.note}</div>
+          </div>`).join("")}
+      </div>
+      <div class="tip" style="border-color:${s.accent}">${s.tip}</div>
+      <button class="var-btn" style="border: 1px solid ${s.accent}30; color:${s.accent}">↓ voir les variations</button>
+      <div class="var-grid">
+        ${s.variations.map(v => `
+          <div class="var-card" style="background:${s.bg}; border-color:${s.accent}30">
+            <div class="var-card-label" style="color:${s.accent}">${v.label}</div>
+            <div class="var-card-detail">${v.detail}</div>
+          </div>`).join("")}
+      </div>
+      <div class="options">${s.options}</div>
+    </div>
+  `;
+
+  card.querySelector(".card-header").addEventListener("click", () => {
+    card.classList.toggle("open");
+    if (card.classList.contains("open")) {
+      card.style.background = s.bg;
+      card.style.borderColor = s.accent + "40";
+    } else {
+      card.style.background = "#fff";
+      card.style.borderColor = "#e8e8e3";
+    }
+  });
+
+  const varBtn = card.querySelector(".var-btn");
+  const varGrid = card.querySelector(".var-grid");
+  varBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    varGrid.classList.toggle("open");
+    varBtn.textContent = varGrid.classList.contains("open") ? "↑ masquer les variations" : "↓ voir les variations";
+  });
+
+  cardsEl.appendChild(card);
+});
+
+// Build steps
+const stepsEl = document.getElementById("steps");
+steps.forEach((s, i) => {
+  const step = document.createElement("div");
+  step.className = "step";
+  step.innerHTML = `<div class="step-num">${i + 1}</div><span class="step-text">${s}</span>`;
+  stepsEl.appendChild(step);
+  if (i < steps.length - 1) {
+    const arrow = document.createElement("span");
+    arrow.className = "arrow";
+    arrow.textContent = "→";
+    stepsEl.appendChild(arrow);
+  }
+});
+
+// Build themes
+const themesEl = document.getElementById("themes");
+themes.forEach(t => {
+  const card = document.createElement("div");
+  card.className = "theme-card";
+  card.innerHTML = `<div class="theme-name">${t.name}</div><div class="theme-detail">${t.detail}</div>`;
+  themesEl.appendChild(card);
+});
+</script>
+</body>
+</html>
